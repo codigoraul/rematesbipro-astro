@@ -29,15 +29,11 @@ jobs:
           WORDPRESS_API_URL: ${{ secrets.WORDPRESS_API_URL }}
 
       - name: Deploy to cPanel via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: sebastianpopp/ftp-action@releases/v2
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: /prueba/
-          protocol: ftp
-          port: 21
-          timeout: 300000
-          log-level: verbose
-          dangerous-clean-slate: false
+          localDir: "dist"
+          remoteDir: "/prueba"
+          options: "--verbose --only-newer"
