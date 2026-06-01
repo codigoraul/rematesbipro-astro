@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getVehiculos, getPropiedades, getOtros, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml } from '../lib/wordpress.js';
 
+const base = import.meta.env.BASE_URL;
 const vehiculos   = await getVehiculos();
 const propiedades = await getPropiedades();
 const otros       = await getOtros();
@@ -12,28 +13,28 @@ const otros       = await getOtros();
   <!-- HERO SLIDER -->
   <section class="relative overflow-hidden" style="height:630px;">
     <div class="slide active" id="slide-0">
-      <div class="slide-bg" style="background-image:url('/images/slider-1.webp');"></div>
+      <div class="slide-bg" style={`background-image:url('${base}/images/slider-1.webp');`}></div>
       <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
       <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
         <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
         <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Vehículos</span></h1>
         <p class="text-white/80 text-lg max-w-md mb-8">Transformando oportunidades en nuevos comienzos.</p>
         <div class="flex gap-3">
-          <a href="/vehiculos" class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver vehículos →</a>
+          <a href={`${base}/vehiculos`} class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver vehículos →</a>
           <a href="#contacto"  class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
         </div>
       </div>
     </div>
 
     <div class="slide" id="slide-1">
-      <div class="slide-bg" style="background-image:url('/images/slider-2.webp');"></div>
+      <div class="slide-bg" style={`background-image:url('${base}/images/slider-2.webp');`}></div>
       <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
       <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
         <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
         <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Propiedades</span></h1>
         <p class="text-white/80 text-lg max-w-md mb-8">Alternativa moderna, transparente y profesional en gestión de bienes.</p>
         <div class="flex gap-3">
-          <a href="/propiedades" class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver propiedades →</a>
+          <a href={`${base}/propiedades`} class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver propiedades →</a>
           <a href="#contacto"    class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
         </div>
       </div>
@@ -68,7 +69,7 @@ const otros       = await getOtros();
         <svg class="w-6 h-6 text-[#012A6C]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17h8M4 11l2-5h12l2 5M4 11h16v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-5z"/><circle cx="7.5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="16.5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/></svg>
         <h2 class="text-2xl font-extrabold text-[#011f52]">Vehículos</h2>
         <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
-        <a href="/vehiculos" class="bg-[#012A6C] text-white text-xs font-bold px-3 py-1 rounded-full">{vehiculos.length} disponibles</a>
+        <a href={`${base}/vehiculos`} class="bg-[#012A6C] text-white text-xs font-bold px-3 py-1 rounded-full">{vehiculos.length} disponibles</a>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {vehiculos.slice(0, 4).map((v) => {
@@ -79,7 +80,7 @@ const otros       = await getOtros();
           const estado = getField(v, 'estado');
           const fecha  = getField(v, 'fecha_remate');
           return (
-            <a href={`/vehiculos/${v.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+            <a href={`${base}/vehiculos/${v.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
               <div class="relative">
                 {img ? <img src={img} class="w-full h-44 object-cover" alt={decodeHtml(v.title.rendered)} /> : <div class="w-full h-44 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
                 <span class="absolute top-2.5 left-2.5 bg-[#012A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Vehículo</span>
@@ -104,7 +105,7 @@ const otros       = await getOtros();
           );
         })}
       </div>
-      {vehiculos.length > 4 && <div class="text-center mt-6"><a href="/vehiculos" class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todos los vehículos →</a></div>}
+      {vehiculos.length > 4 && <div class="text-center mt-6"><a href={`${base}/vehiculos`} class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todos los vehículos →</a></div>}
     </div>
 
     <!-- PROPIEDADES -->
@@ -113,7 +114,7 @@ const otros       = await getOtros();
         <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         <h2 class="text-2xl font-extrabold text-[#011f52]">Propiedades</h2>
         <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
-        <a href="/propiedades" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">{propiedades.length} disponibles</a>
+        <a href={`${base}/propiedades`} class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">{propiedades.length} disponibles</a>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {propiedades.slice(0, 3).map((p) => {
@@ -124,7 +125,7 @@ const otros       = await getOtros();
           const comuna = getField(p, 'comuna');
           const fecha  = getField(p, 'fecha_remate');
           return (
-            <a href={`/propiedades/${p.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+            <a href={`${base}/propiedades/${p.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
               <div class="relative">
                 {img ? <img src={img} class="w-full h-48 object-cover" alt={decodeHtml(p.title.rendered)} /> : <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
                 <span class="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">{tipo || 'Propiedad'}</span>
@@ -148,7 +149,7 @@ const otros       = await getOtros();
           );
         })}
       </div>
-      {propiedades.length > 3 && <div class="text-center mt-6"><a href="/propiedades" class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todas las propiedades →</a></div>}
+      {propiedades.length > 3 && <div class="text-center mt-6"><a href={`${base}/propiedades`} class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todas las propiedades →</a></div>}
     </div>
 
     <!-- OTROS -->
@@ -157,7 +158,7 @@ const otros       = await getOtros();
         <svg class="w-6 h-6 text-[#6F7983]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         <h2 class="text-2xl font-extrabold text-[#011f52]">Otros</h2>
         <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
-        <a href="/otros" class="bg-[#6F7983] text-white text-xs font-bold px-3 py-1 rounded-full">{otros.length} disponibles</a>
+        <a href={`${base}/otros`} class="bg-[#6F7983] text-white text-xs font-bold px-3 py-1 rounded-full">{otros.length} disponibles</a>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {otros.slice(0, 3).map((o) => {
@@ -167,7 +168,7 @@ const otros       = await getOtros();
           const estado = getField(o, 'estado');
           const fecha  = getField(o, 'fecha_remate');
           return (
-            <a href={`/otros/${o.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+            <a href={`${base}/otros/${o.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
               <div class="relative">
                 {img ? <img src={img} class="w-full h-44 object-cover" alt={decodeHtml(o.title.rendered)} /> : <div class="w-full h-44 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
                 <span class="absolute top-2.5 left-2.5 bg-[#6F7983] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">{cat || 'Otros'}</span>
