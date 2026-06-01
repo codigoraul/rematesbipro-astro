@@ -1,0 +1,332 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getVehiculos, getPropiedades, getOtros, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml } from '../lib/wordpress.js';
+
+const vehiculos   = await getVehiculos();
+const propiedades = await getPropiedades();
+const otros       = await getOtros();
+---
+
+<Layout title="Inicio">
+
+  <!-- HERO SLIDER -->
+  <section class="relative overflow-hidden" style="height:630px;">
+    <div class="slide active" id="slide-0">
+      <div class="slide-bg" style="background-image:url('/images/slider-1.webp');"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
+      <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
+        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
+        <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Vehículos</span></h1>
+        <p class="text-white/80 text-lg max-w-md mb-8">Transformando oportunidades en nuevos comienzos.</p>
+        <div class="flex gap-3">
+          <a href="/vehiculos" class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver vehículos →</a>
+          <a href="#contacto"  class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-1">
+      <div class="slide-bg" style="background-image:url('/images/slider-2.webp');"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
+      <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
+        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
+        <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Propiedades</span></h1>
+        <p class="text-white/80 text-lg max-w-md mb-8">Alternativa moderna, transparente y profesional en gestión de bienes.</p>
+        <div class="flex gap-3">
+          <a href="/propiedades" class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver propiedades →</a>
+          <a href="#contacto"    class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="absolute bottom-7 left-1/2 -translate-x-1/2 flex gap-2.5 z-10">
+      <button onclick="goSlide(0)" class="dot active w-3 h-3 rounded-full bg-white/50 transition-all" id="dot-0"></button>
+      <button onclick="goSlide(1)" class="dot w-3 h-3 rounded-full bg-white/50 transition-all" id="dot-1"></button>
+    </div>
+    <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/15 hover:bg-white/30 text-white w-11 h-11 rounded-full flex items-center justify-center border border-white/20 text-xl">‹</button>
+    <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/15 hover:bg-white/30 text-white w-11 h-11 rounded-full flex items-center justify-center border border-white/20 text-xl">›</button>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="bg-[#012A6C] text-white">
+    <div class="max-w-7xl mx-auto px-5 py-4 flex flex-wrap justify-around gap-4 text-center">
+      <div><div class="text-2xl font-bold">{vehiculos.length}</div><div class="text-xs text-blue-200 uppercase tracking-wider">Vehículos</div></div>
+      <div class="w-px bg-white/20 hidden md:block"></div>
+      <div><div class="text-2xl font-bold">{propiedades.length}</div><div class="text-xs text-blue-200 uppercase tracking-wider">Propiedades</div></div>
+      <div class="w-px bg-white/20 hidden md:block"></div>
+      <div><div class="text-2xl font-bold">{otros.length}</div><div class="text-xs text-blue-200 uppercase tracking-wider">Otros ítems</div></div>
+      <div class="w-px bg-white/20 hidden md:block"></div>
+      <div><div class="text-2xl font-bold">Nacional</div><div class="text-xs text-blue-200 uppercase tracking-wider">Cobertura Chile</div></div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-5 py-12">
+
+    <!-- VEHÍCULOS -->
+    <div class="mb-14">
+      <div class="flex items-center gap-3 mb-6">
+        <svg class="w-6 h-6 text-[#012A6C]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17h8M4 11l2-5h12l2 5M4 11h16v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-5z"/><circle cx="7.5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="16.5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        <h2 class="text-2xl font-extrabold text-[#011f52]">Vehículos</h2>
+        <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
+        <a href="/vehiculos" class="bg-[#012A6C] text-white text-xs font-bold px-3 py-1 rounded-full">{vehiculos.length} disponibles</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {vehiculos.slice(0, 4).map((v) => {
+          const img    = getFeaturedImage(v);
+          const precio = getField(v, 'precio_base');
+          const anio   = getField(v, 'anio');
+          const km     = getField(v, 'kilometraje');
+          const estado = getField(v, 'estado');
+          const fecha  = getField(v, 'fecha_remate');
+          return (
+            <a href={`/vehiculos/${v.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+              <div class="relative">
+                {img ? <img src={img} class="w-full h-44 object-cover" alt={decodeHtml(v.title.rendered)} /> : <div class="w-full h-44 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
+                <span class="absolute top-2.5 left-2.5 bg-[#012A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Vehículo</span>
+                {fecha && <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">{formatFecha(fecha)}</span>}
+              </div>
+              <div class="p-4">
+                <h3 class="font-bold text-gray-900 mb-2 line-clamp-1">{decodeHtml(v.title.rendered)}</h3>
+                <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#6F7983] mb-3">
+                  {anio && <span class="inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{anio}</span>}
+                  {km   && <span class="inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>{Number(km).toLocaleString('es-CL')} km</span>}
+                  {estado && <span class="inline-flex items-center gap-1 text-emerald-600"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{estado.replace(/_/g, ' ')}</span>}
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div>
+                    <p class="text-[10px] text-[#6F7983] uppercase tracking-wide">Base remate</p>
+                    <p class="text-[#012A6C] font-extrabold text-lg">{formatPrecio(precio)}</p>
+                  </div>
+                  <span class="bg-[#012A6C] text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Ver más</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+      {vehiculos.length > 4 && <div class="text-center mt-6"><a href="/vehiculos" class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todos los vehículos →</a></div>}
+    </div>
+
+    <!-- PROPIEDADES -->
+    <div class="mb-14">
+      <div class="flex items-center gap-3 mb-6">
+        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <h2 class="text-2xl font-extrabold text-[#011f52]">Propiedades</h2>
+        <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
+        <a href="/propiedades" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">{propiedades.length} disponibles</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {propiedades.slice(0, 3).map((p) => {
+          const img    = getFeaturedImage(p);
+          const precio = getField(p, 'precio_base');
+          const tipo   = getField(p, 'tipo_propiedad');
+          const sup    = getField(p, 'superficie_m2');
+          const comuna = getField(p, 'comuna');
+          const fecha  = getField(p, 'fecha_remate');
+          return (
+            <a href={`/propiedades/${p.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+              <div class="relative">
+                {img ? <img src={img} class="w-full h-48 object-cover" alt={decodeHtml(p.title.rendered)} /> : <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
+                <span class="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">{tipo || 'Propiedad'}</span>
+                {fecha && <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">{formatFecha(fecha)}</span>}
+              </div>
+              <div class="p-4">
+                <h3 class="font-bold text-gray-900 mb-2 line-clamp-1">{decodeHtml(p.title.rendered)}</h3>
+                <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#6F7983] mb-3">
+                  {sup    && <span class="inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>{sup} m²</span>}
+                  {comuna && <span class="inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{comuna}</span>}
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div>
+                    <p class="text-[10px] text-[#6F7983] uppercase tracking-wide">Base remate</p>
+                    <p class="text-[#012A6C] font-extrabold text-lg">{formatPrecio(precio)}</p>
+                  </div>
+                  <span class="bg-[#012A6C] text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Ver más</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+      {propiedades.length > 3 && <div class="text-center mt-6"><a href="/propiedades" class="inline-block bg-[#012A6C] hover:bg-[#011f52] text-white font-semibold px-6 py-2.5 rounded-xl transition">Ver todas las propiedades →</a></div>}
+    </div>
+
+    <!-- OTROS -->
+    <div class="mb-6">
+      <div class="flex items-center gap-3 mb-6">
+        <svg class="w-6 h-6 text-[#6F7983]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <h2 class="text-2xl font-extrabold text-[#011f52]">Otros</h2>
+        <div class="flex-1 h-0.5 bg-gradient-to-r from-[#012A6C] to-transparent rounded"></div>
+        <a href="/otros" class="bg-[#6F7983] text-white text-xs font-bold px-3 py-1 rounded-full">{otros.length} disponibles</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {otros.slice(0, 3).map((o) => {
+          const img    = getFeaturedImage(o);
+          const precio = getField(o, 'precio_base');
+          const cat    = getField(o, 'categoria');
+          const estado = getField(o, 'estado');
+          const fecha  = getField(o, 'fecha_remate');
+          return (
+            <a href={`/otros/${o.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-md block">
+              <div class="relative">
+                {img ? <img src={img} class="w-full h-44 object-cover" alt={decodeHtml(o.title.rendered)} /> : <div class="w-full h-44 bg-gray-200 flex items-center justify-center text-gray-400 text-sm">Sin imagen</div>}
+                <span class="absolute top-2.5 left-2.5 bg-[#6F7983] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">{cat || 'Otros'}</span>
+                {fecha && <span class="absolute top-2.5 right-2.5 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">{formatFecha(fecha)}</span>}
+              </div>
+              <div class="p-4">
+                <h3 class="font-bold text-gray-900 mb-2 line-clamp-1">{decodeHtml(o.title.rendered)}</h3>
+                <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#6F7983] mb-3">
+                  {estado && <span class="inline-flex items-center gap-1 text-emerald-600"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{estado.replace(/_/g, ' ')}</span>}
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div>
+                    <p class="text-[10px] text-[#6F7983] uppercase tracking-wide">Base remate</p>
+                    <p class="text-[#012A6C] font-extrabold text-lg">{formatPrecio(precio)}</p>
+                  </div>
+                  <span class="bg-[#012A6C] text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Ver más</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+
+  </main>
+
+  <!-- QUIÉNES SOMOS -->
+  <section class="bg-white py-16 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <span class="inline-block text-xs font-bold uppercase tracking-widest text-[#012A6C] bg-blue-50 px-3 py-1 rounded-full mb-4">Nuestra Historia</span>
+        <h2 class="text-3xl md:text-4xl font-bold text-[#011f52] leading-tight mb-5">
+          Transformando oportunidades<br class="hidden md:block"/> en nuevos comienzos
+        </h2>
+        <p class="text-gray-600 text-base leading-relaxed mb-4">
+          BIPRO Remates nace con la convicción de hacer las cosas de manera diferente. Creamos esta empresa con el objetivo de entregar un servicio de remates moderno, transparente y cercano, enfocado en generar confianza tanto en personas como en empresas que necesitan vender o adquirir bienes de forma segura y eficiente.
+        </p>
+        <p class="text-gray-600 text-base leading-relaxed mb-4">
+          Entendemos que detrás de cada remate existe una necesidad importante: cerrar un ciclo, recuperar valor, generar nuevas oportunidades o dar un nuevo destino a distintos bienes. Por eso trabajamos con responsabilidad, compromiso y seriedad profesional en cada operación.
+        </p>
+        <p class="text-[#012A6C] font-bold text-lg italic">"Transformando oportunidades en nuevos comienzos."</p>
+      </div>
+      <div class="grid grid-cols-1 gap-5">
+        <div class="bg-blue-50 rounded-2xl p-6 flex gap-4 items-start">
+          <div class="w-9 h-9 flex-shrink-0 text-[#012A6C]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg></div>
+          <div>
+            <h3 class="font-bold text-[#011f52] mb-1">Nuestra Misión</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">Entregar soluciones eficientes y confiables en remates y gestión de activos, ofreciendo un servicio cercano, transparente y respaldado por herramientas tecnológicas modernas.</p>
+          </div>
+        </div>
+        <div class="bg-blue-50 rounded-2xl p-6 flex gap-4 items-start">
+          <div class="w-9 h-9 flex-shrink-0 text-[#012A6C]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div>
+            <h3 class="font-bold text-[#011f52] mb-1">Nuestra Visión</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">Ser una empresa reconocida por su transparencia, innovación y profesionalismo, liderando la modernización de los remates y la gestión de bienes en Chile.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALORES -->
+  <section class="bg-gray-50 py-12 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-5">
+      <div class="text-center mb-8">
+        <span class="inline-block text-xs font-bold uppercase tracking-widest text-[#012A6C] bg-blue-50 px-3 py-1 rounded-full mb-3">Nuestros Valores</span>
+        <h2 class="text-2xl md:text-3xl font-bold text-[#011f52]">Lo que nos define</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {[
+          { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>', titulo: 'Transparencia', desc: 'Información clara en cada etapa.' },
+          { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>', titulo: 'Confianza', desc: 'Relaciones sólidas y duraderas.' },
+          { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>', titulo: 'Profesionalismo', desc: 'Seriedad en cada operación.' },
+          { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>', titulo: 'Innovación', desc: 'Tecnología moderna en remates.' },
+          { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>', titulo: 'Compromiso', desc: 'Siempre orientados a tus metas.' },
+        ].map(v => (
+          <div class="bg-white rounded-2xl p-5 text-center border border-gray-100 shadow-sm hover:shadow-md transition">
+            <div class="w-8 h-8 mx-auto mb-3 text-[#012A6C]" set:html={v.svg} />
+            <h3 class="font-bold text-[#011f52] text-sm mb-1">{v.titulo}</h3>
+            <p class="text-gray-400 text-xs">{v.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+
+  <!-- NUESTRO COMPROMISO -->
+  <section class="bg-[#011f52] py-16">
+    <div class="max-w-7xl mx-auto px-5 text-center">
+      <span class="inline-block text-xs font-bold uppercase tracking-widest text-blue-300 bg-white/10 px-3 py-1 rounded-full mb-4">Nuestro compromiso</span>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">¿Por qué elegirnos?</h2>
+      <p class="text-white/60 text-base max-w-xl mx-auto mb-12">Nos enfocamos en entregar soluciones ágiles en remates de vehículos, propiedades, maquinaria y activos, construyendo relaciones de confianza a largo plazo.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        {[
+          { titulo: 'Transparencia', desc: 'Información clara en cada etapa del proceso.' },
+          { titulo: 'Atención cercana', desc: 'Servicio personalizado para cada cliente.' },
+          { titulo: 'Profesionalismo', desc: 'Confianza y seriedad en cada operación.' },
+          { titulo: 'Innovación', desc: 'Tecnología moderna aplicada a los remates.' },
+          { titulo: 'Compromiso', desc: 'Orientados siempre a tus objetivos.' },
+        ].map(item => (
+          <div class="bg-white/5 hover:bg-white/10 transition rounded-2xl p-6 border border-white/10">
+            
+            <h3 class="text-white font-bold mb-1">{item.titulo}</h3>
+            <p class="text-white/50 text-sm">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LLAMADA A LA ACCIÓN -->
+  <section class="bg-gray-50 py-14 border-t border-gray-100" id="contacto">
+    <div class="max-w-3xl mx-auto px-5 text-center">
+      <h2 class="text-3xl font-bold text-[#011f52] mb-3">¿Tienes un bien para rematar?</h2>
+      <p class="text-gray-500 text-base mb-8">Contáctanos y te asesoramos sin compromiso. Trabajamos con personas y empresas en todo Chile.</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="mailto:contacto@rematesbipro.cl" class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-7 py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="1.8"/><path d="M2 7l10 7 10-7" stroke="white" stroke-width="1.8"/></svg>
+          contacto@rematesbipro.cl
+        </a>
+        <a href="tel:+56975884719" class="bg-white border border-gray-200 hover:bg-gray-50 text-[#011f52] font-bold px-7 py-3 rounded-xl transition flex items-center justify-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C9.61 21 3 14.39 3 6a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" stroke="#011f52" stroke-width="1.8"/></svg>
+          +56 9 7588 4719
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+
+</Layout>
+
+<style>
+  .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; pointer-events: none; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide.active .slide-bg { animation: kb 8s ease forwards; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.06); } }
+  .slide-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .dot.active { background: white; transform: scale(1.3); }
+</style>
+
+<script>
+  let current = 0;
+  const total = 2;
+  let timer: ReturnType<typeof setInterval>;
+  function goSlide(n: number) {
+    document.getElementById('slide-' + current)?.classList.remove('active');
+    document.getElementById('dot-' + current)?.classList.remove('active');
+    current = n;
+    document.getElementById('slide-' + current)?.classList.add('active');
+    document.getElementById('dot-' + current)?.classList.add('active');
+    clearInterval(timer);
+    timer = setInterval(nextSlide, 5000);
+  }
+  function nextSlide() { goSlide((current + 1) % total); }
+  function prevSlide() { goSlide((current - 1 + total) % total); }
+  (window as any).goSlide = goSlide;
+  (window as any).nextSlide = nextSlide;
+  (window as any).prevSlide = prevSlide;
+  timer = setInterval(nextSlide, 5000);
+</script>

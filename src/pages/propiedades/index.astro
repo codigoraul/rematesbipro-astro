@@ -1,0 +1,100 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPropiedades, getFeaturedImage, getField, formatPrecio, formatFecha } from '../../lib/wordpress.js';
+
+const propiedades = await getPropiedades();
+---
+
+<Layout title="Propiedades en Remate">
+
+  <!-- HERO -->
+  <section class="relative text-white py-16 overflow-hidden" style="min-height:160px">
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1600&q=60&fm=webp')"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(90deg,rgba(13,31,60,0.88) 0%,rgba(13,31,60,0.65) 100%)"></div>
+    <div class="relative max-w-7xl mx-auto px-5">
+      <div class="flex items-center gap-3 mb-1">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M9 21V12h6v9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="text-2xl font-bold tracking-tight">Propiedades en Remate</h1>
+      </div>
+      <p class="text-blue-200 text-sm">{propiedades.length} propiedad{propiedades.length !== 1 ? 'es' : ''} disponible{propiedades.length !== 1 ? 's' : ''}</p>
+    </div>
+  </section>
+
+  <!-- LISTADO -->
+  <main class="max-w-7xl mx-auto px-5 py-10">
+    {propiedades.length === 0 ? (
+      <div class="text-center py-20 text-gray-400">
+        <svg class="mx-auto mb-4 opacity-30" width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <p class="text-lg font-medium text-gray-500">No hay propiedades disponibles</p>
+        <p class="text-sm mt-1">Vuelve pronto para ver nuevos remates</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {propiedades.map((p) => {
+          const img       = getFeaturedImage(p);
+          const tipo      = getField(p, 'tipo_propiedad');
+          const superficie= getField(p, 'superficie_m2');
+          const ubicacion = getField(p, 'comuna');
+          const precio    = getField(p, 'precio_base');
+          const fecha     = getField(p, 'fecha_remate');
+          return (
+            <a href={`/propiedades/${p.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-primary/30 block">
+              <div class="relative overflow-hidden" style="height:200px">
+                {img
+                  ? <img src={img} alt={p.title?.rendered || 'Propiedad'} class="w-full h-full object-cover" loading="lazy" />
+                  : <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                }
+                {fecha && (
+                  <span class="absolute top-3 right-3 bg-accent text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                    {formatFecha(fecha)}
+                  </span>
+                )}
+                {tipo && (
+                  <span class="absolute top-3 left-3 bg-white/90 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200">
+                    {tipo}
+                  </span>
+                )}
+              </div>
+              <div class="p-4">
+                <h2 class="font-bold text-gray-900 text-base leading-tight truncate">
+                  {p.title?.rendered}
+                </h2>
+                <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
+                  {superficie && (
+                    <span class="meta-icon">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="1" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M3 8h18M8 3v18" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 2"/>
+                      </svg>
+                      {superficie} m²
+                    </span>
+                  )}
+                  {ubicacion && (
+                    <span class="meta-icon">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z" stroke="currentColor" stroke-width="1.8"/>
+                        <circle cx="12" cy="8" r="2" stroke="currentColor" stroke-width="1.8"/>
+                      </svg>
+                      {ubicacion}
+                    </span>
+                  )}
+                </div>
+                <p class="text-accent font-extrabold text-xl mt-3">{formatPrecio(precio)}</p>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </main>
+
+</Layout>
