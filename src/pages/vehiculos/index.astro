@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getVehiculos, getFeaturedImage, getField, formatPrecio, formatFecha } from '../../lib/wordpress.js';
 
+const base = import.meta.env.BASE_URL;
 const vehiculos = await getVehiculos();
 ---
 
@@ -46,7 +47,7 @@ const vehiculos = await getVehiculos();
           const fecha   = getField(v, 'fecha_remate');
           const estado  = getField(v, 'estado_vehiculo');
           return (
-            <a href={`/vehiculos/${v.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-primary/30 block">
+            <a href={`${base}/vehiculos/${v.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-primary/30 block">
               <div class="relative overflow-hidden" style="height:200px">
                 {img
                   ? <img src={img} alt={v.title?.rendered || 'Vehículo'} class="w-full h-full object-cover" loading="lazy" />
