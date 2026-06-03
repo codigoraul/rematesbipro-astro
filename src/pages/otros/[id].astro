@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getOtros, getOtro, getFeaturedImage, getField, formatPrecio, formatFecha } from '../../lib/wordpress.js';
+import { getOtros, getOtro, getFeaturedImage, getField, formatPrecio, formatFecha, getYoastSEO } from '../../lib/wordpress.js';
 
 export async function getStaticPaths() {
   const otros = await getOtros();
@@ -19,6 +19,7 @@ const fecha       = getField(o, 'fecha_remate');
 const galeria     = getField(o, 'galeria');
 
 const titulo = o.title?.rendered;
+const seo = getYoastSEO(o);
 
 // Imágenes: featured + ACF galería + adjuntos WP
 const imgs: string[] = [];
@@ -36,7 +37,12 @@ if (Array.isArray((o as any)._attachments)) {
 }
 ---
 
-<Layout title={titulo}>
+<Layout 
+  title={seo?.title || titulo}
+  description={seo?.description}
+  ogImage={seo?.ogImage || img}
+  canonical={seo?.canonical}
+>
 
   <!-- BREADCRUMB -->
   <div class="bg-white border-b border-gray-100">

@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getPropiedades, getPropiedad, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml } from '../../lib/wordpress.js';
+import { getPropiedades, getPropiedad, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml, getYoastSEO } from '../../lib/wordpress.js';
 
 export async function getStaticPaths() {
   const propiedades = await getPropiedades();
@@ -23,6 +23,7 @@ const dorms      = getField(p, 'dormitorios');
 const banos      = getField(p, 'banos');
 
 const titulo = decodeHtml(p.title?.rendered);
+const seo = getYoastSEO(p);
 const precioUF = getField(p, 'prop_precio_uf') || precio;
 
 // Imágenes: featured + ACF galería + adjuntos WP
@@ -41,7 +42,12 @@ if (Array.isArray((p as any)._attachments)) {
 }
 ---
 
-<Layout title={titulo}>
+<Layout 
+  title={seo?.title || titulo}
+  description={seo?.description}
+  ogImage={seo?.ogImage || img}
+  canonical={seo?.canonical}
+>
 
   <!-- BREADCRUMB -->
   <div class="bg-white border-b border-gray-100">
