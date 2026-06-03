@@ -14,11 +14,12 @@ const otros       = await getOtros();
   <section class="relative overflow-hidden" style="height:630px;">
     <div class="slide active" id="slide-0">
       <div class="slide-bg" style={`background-image:url('${base}/images/slider-1.webp');`}></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
       <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
-        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
-        <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Vehículos</span></h1>
-        <p class="text-white/80 text-lg max-w-md mb-8">Transformando oportunidades en nuevos comienzos.</p>
+        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-3 uppercase tracking-widest">Remate activo</span>
+        <div class="bg-[#011f52]/35 backdrop-blur-sm rounded-2xl px-8 py-5 w-fit mb-4">
+          <h1 class="text-white font-bold text-4xl md:text-5xl leading-tight mb-2 drop-shadow-lg">Remate <span class="text-orange-500">Vehículos</span></h1>
+          <p class="text-white/80 text-base max-w-md">Transformando oportunidades en nuevos comienzos.</p>
+        </div>
         <div class="flex gap-3">
           <a href={`${base}/vehiculos`} class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver vehículos →</a>
           <a href="#contacto"  class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
@@ -28,11 +29,12 @@ const otros       = await getOtros();
 
     <div class="slide" id="slide-1">
       <div class="slide-bg" style={`background-image:url('${base}/images/slider-2.webp');`}></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-[#011f52]/90 via-[#011f52]/60 to-transparent"></div>
       <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
-        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-5 uppercase tracking-widest">🔴 Remate activo</span>
-        <h1 class="text-white font-bold text-5xl md:text-6xl leading-tight mb-4 drop-shadow-lg">Remate<br><span class="text-blue-300">Propiedades</span></h1>
-        <p class="text-white/80 text-lg max-w-md mb-8">Alternativa moderna, transparente y profesional en gestión de bienes.</p>
+        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-3 uppercase tracking-widest">Remate activo</span>
+        <div class="bg-[#011f52]/35 backdrop-blur-sm rounded-2xl px-8 py-5 w-fit mb-4">
+          <h1 class="text-white font-bold text-4xl md:text-5xl leading-tight mb-2 drop-shadow-lg">Remate <span class="text-orange-500">Propiedades</span></h1>
+          <p class="text-white/80 text-base max-w-md">Alternativa moderna, transparente y profesional en gestión de bienes.</p>
+        </div>
         <div class="flex gap-3">
           <a href={`${base}/propiedades`} class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver propiedades →</a>
           <a href="#contacto"    class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
@@ -40,9 +42,25 @@ const otros       = await getOtros();
       </div>
     </div>
 
+    <div class="slide" id="slide-2">
+      <div class="slide-bg" style={`background-image:url('${base}/images/slider-3.webp');`}></div>
+      <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-center">
+        <span class="inline-flex items-center bg-white/15 backdrop-blur border border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-3 uppercase tracking-widest">Remate activo</span>
+        <div class="bg-[#011f52]/35 backdrop-blur-sm rounded-2xl px-8 py-5 w-fit mb-4">
+          <h1 class="text-white font-bold text-4xl md:text-5xl leading-tight mb-2 drop-shadow-lg">Remate <span class="text-orange-500">Maquinaria</span></h1>
+          <p class="text-white/80 text-base max-w-md">Equipos y maquinaria pesada disponibles para remate.</p>
+        </div>
+        <div class="flex gap-3">
+          <a href={`${base}/otros`} class="bg-[#012A6C] hover:bg-[#011f52] text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver maquinaria →</a>
+          <a href="#contacto" class="bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl transition border border-white/30">Cómo participar</a>
+        </div>
+      </div>
+    </div>
+
     <div class="absolute bottom-7 left-1/2 -translate-x-1/2 flex gap-2.5 z-10">
       <button onclick="goSlide(0)" class="dot active w-3 h-3 rounded-full bg-white/50 transition-all" id="dot-0"></button>
       <button onclick="goSlide(1)" class="dot w-3 h-3 rounded-full bg-white/50 transition-all" id="dot-1"></button>
+      <button onclick="goSlide(2)" class="dot w-3 h-3 rounded-full bg-white/50 transition-all" id="dot-2"></button>
     </div>
     <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/15 hover:bg-white/30 text-white w-11 h-11 rounded-full flex items-center justify-center border border-white/20 text-xl">‹</button>
     <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/15 hover:bg-white/30 text-white w-11 h-11 rounded-full flex items-center justify-center border border-white/20 text-xl">›</button>
@@ -200,7 +218,7 @@ const otros       = await getOtros();
     <div class="max-w-7xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
       <div>
         <span class="inline-block text-xs font-bold uppercase tracking-widest text-[#012A6C] bg-blue-50 px-3 py-1 rounded-full mb-4">Nuestra Historia</span>
-        <h2 class="text-3xl md:text-4xl font-bold text-[#011f52] leading-tight mb-5">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#011f52] leading-tight mb-5">
           Transformando oportunidades<br class="hidden md:block"/> en nuevos comienzos
         </h2>
         <p class="text-gray-600 text-base leading-relaxed mb-4">
@@ -260,7 +278,7 @@ const otros       = await getOtros();
   <section class="bg-[#011f52] py-16">
     <div class="max-w-7xl mx-auto px-5 text-center">
       <span class="inline-block text-xs font-bold uppercase tracking-widest text-blue-300 bg-white/10 px-3 py-1 rounded-full mb-4">Nuestro compromiso</span>
-      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">¿Por qué elegirnos?</h2>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-3">¿Por qué elegirnos?</h2>
       <p class="text-white/60 text-base max-w-xl mx-auto mb-12">Nos enfocamos en entregar soluciones ágiles en remates de vehículos, propiedades, maquinaria y activos, construyendo relaciones de confianza a largo plazo.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {[
@@ -313,7 +331,7 @@ const otros       = await getOtros();
 
 <script>
   let current = 0;
-  const total = 2;
+  const total = 3;
   let timer: ReturnType<typeof setInterval>;
   function goSlide(n: number) {
     document.getElementById('slide-' + current)?.classList.remove('active');
