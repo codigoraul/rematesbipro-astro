@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getVehiculos, getVehiculo, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml } from '../../lib/wordpress.js';
+import { getVehiculos, getVehiculo, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml, getYoastSEO } from '../../lib/wordpress.js';
 
 export async function getStaticPaths() {
   const vehiculos = await getVehiculos();
@@ -22,6 +22,7 @@ const estado   = getField(v, 'estado_vehiculo');
 const galeria  = getField(v, 'galeria');  // array of image objects or URLs
 
 const titulo   = marca && modelo ? `${marca} ${modelo}` : decodeHtml(v.title?.rendered);
+const seo      = getYoastSEO(v);
 
 // Recopilar imágenes: featured + ACF galería + adjuntos WP
 const imgs: string[] = [];
@@ -39,7 +40,12 @@ if (Array.isArray((v as any)._attachments)) {
 }
 ---
 
-<Layout title={titulo}>
+<Layout 
+  title={seo?.title || titulo}
+  description={seo?.description}
+  ogImage={seo?.ogImage || img}
+  canonical={seo?.canonical}
+>
 
   <!-- BREADCRUMB -->
   <div class="bg-white border-b border-gray-100">

@@ -128,3 +128,17 @@ export function formatFecha(fecha) {
   const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   return `${d} ${meses[parseInt(m) - 1]} ${y}`;
 }
+
+// ── YOAST SEO ────────────────────────────────
+export function getYoastSEO(post) {
+  if (!post) return null;
+  return {
+    title: post.yoast_head_json?.title || post.title?.rendered,
+    description: post.yoast_head_json?.description || '',
+    ogTitle: post.yoast_head_json?.og_title || post.title?.rendered,
+    ogDescription: post.yoast_head_json?.og_description || '',
+    ogImage: post.yoast_head_json?.og_image?.[0]?.url || '',
+    canonical: post.yoast_head_json?.canonical || '',
+    schema: post.yoast_head_json?.schema || null
+  };
+}
