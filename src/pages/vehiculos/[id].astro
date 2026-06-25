@@ -19,6 +19,8 @@ const km       = getField(v, 'kilometraje');
 const precio   = getField(v, 'precio_base');
 const fecha    = getField(v, 'fecha_remate');
 const estado   = getField(v, 'estado_vehiculo');
+const hora     = getField(v, 'hora_remate');
+const zoom     = getField(v, 'enlace_zoom');
 const galeria  = getField(v, 'galeria');  // array of image objects or URLs
 
 const titulo   = marca && modelo ? `${marca} ${modelo}` : decodeHtml(v.title?.rendered);
@@ -140,35 +142,45 @@ if (Array.isArray((v as any)._attachments)) {
         <p class="text-gray-400 text-sm mt-0.5">Precio base de remate</p>
 
         <!-- FICHA TÉCNICA -->
-        <div class="mt-6 bg-gray-50 rounded-2xl p-5 grid grid-cols-2 gap-4">
+        <div class="mt-6 bg-gray-50 rounded-2xl p-6 grid grid-cols-2 gap-5">
           {marca && (
             <div>
-              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Marca</p>
-              <p class="text-gray-800 font-semibold mt-0.5">{marca}</p>
+              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Marca</p>
+              <p class="text-gray-900 font-bold mt-1 text-xl">{marca}</p>
             </div>
           )}
           {modelo && (
             <div>
-              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Modelo</p>
-              <p class="text-gray-800 font-semibold mt-0.5">{modelo}</p>
+              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Modelo</p>
+              <p class="text-gray-900 font-bold mt-1 text-xl">{modelo}</p>
             </div>
           )}
           {anio && (
             <div>
-              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Año</p>
-              <p class="text-gray-800 font-semibold mt-0.5">{anio}</p>
+              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Año</p>
+              <p class="text-gray-900 font-bold mt-1 text-xl">{anio}</p>
             </div>
           )}
-          {km && (
+          {km && Number(km) > 0 && (
             <div>
-              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Kilometraje</p>
-              <p class="text-gray-800 font-semibold mt-0.5">{Number(km).toLocaleString('es-CL')} km</p>
+              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Kilometraje</p>
+              <p class="text-gray-900 font-bold mt-1 text-xl">{Number(km).toLocaleString('es-CL')} km</p>
             </div>
           )}
           {fecha && (
             <div class="col-span-2">
-              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Fecha de remate</p>
-              <p class="text-accent font-bold mt-0.5 text-lg">{formatFecha(fecha)}</p>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Fecha de remate</p>
+                  <p class="text-accent font-extrabold mt-1 text-2xl">{formatFecha(fecha)}</p>
+                </div>
+                {hora && (
+                  <div>
+                    <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Hora</p>
+                    <p class="text-accent font-extrabold mt-1 text-2xl">{hora}</p>
+                  </div>
+                )}
+              </div>
               <div class="flex flex-wrap gap-2 mt-3"
                 id="cal-btns"
                 data-fecha={String(fecha).replace(/-/g,'')}
@@ -184,6 +196,13 @@ if (Array.isArray((v as any)._attachments)) {
                   Apple / iCal
                 </button>
               </div>
+              {zoom && (
+                <a href={zoom} target="_blank" rel="noopener"
+                  class="mt-4 inline-flex items-center gap-2 bg-[#2D8CFF] hover:bg-[#0b7bff] text-white font-bold px-5 py-3 rounded-xl transition text-base shadow-sm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M3 7a2 2 0 012-2h9a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm15 2.5l3.5-2.5v10L18 14.5v-5z"/></svg>
+                  Unirse al remate por Zoom
+                </a>
+              )}
             </div>
           )}
         </div>

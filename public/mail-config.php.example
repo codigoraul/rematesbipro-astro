@@ -1,0 +1,12 @@
+<?php
+// Copia este archivo como  public/mail-config.php  y ajusta los valores.
+// IMPORTANTE: agrega  public/mail-config.php  al .gitignore (no subir a git).
+// Estos valores SOBREESCRIBEN los del mail.php sin tocar el código.
+
+return [
+  'SITE_URL'   => 'https://rematesbipro.cl',
+  'TO_EMAIL'   => 'codigoraul@gmail.com',        // se suma a los destinatarios base
+  'FROM_EMAIL' => 'contacto@rematesbipro.cl',    // usa el mismo dominio del sitio
+  'FROM_NAME'  => 'Remates BiPro',
+  'BCC_EMAILS' => '',                            // opcional, separa varios con coma
+];

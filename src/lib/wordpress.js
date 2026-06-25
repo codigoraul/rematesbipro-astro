@@ -3,10 +3,15 @@
 // ─────────────────────────────────────────────
 const WP_URL = import.meta.env.WORDPRESS_API_URL || 'http://localhost:10004/wp-json/wp/v2';
 
+// Cache-buster por build: evita respuestas cacheadas (stale) de la API REST
+// de WordPress, garantizando datos frescos en cada compilación.
+const BUILD_TS = Date.now();
+
 // Fetch genérico con manejo de errores
 async function wpFetch(endpoint) {
   try {
-    const res = await fetch(`${WP_URL}${endpoint}`);
+    const sep = endpoint.includes('?') ? '&' : '?';
+    const res = await fetch(`${WP_URL}${endpoint}${sep}_cb=${BUILD_TS}`);
     if (!res.ok) throw new Error(`WP API error: ${res.status}`);
     return await res.json();
   } catch (e) {
