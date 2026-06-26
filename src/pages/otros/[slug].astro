@@ -4,10 +4,24 @@ import { getOtros, getOtro, getFeaturedImage, getField, formatPrecio, formatFech
 
 export async function getStaticPaths() {
   const otros = await getOtros();
-  return otros.map((o) => ({ params: { id: String(o.id) } }));
+  const seen = new Set();
+  const paths = [];
+  for (const o of otros) {
+    if (o.slug && !seen.has(o.slug)) {
+      paths.push({ params: { slug: o.slug }, props: { id: o.id } });
+      seen.add(o.slug);
+    }
+    // Retrocompatibilidad: las URLs numéricas antiguas siguen funcionando
+    const idStr = String(o.id);
+    if (!seen.has(idStr)) {
+      paths.push({ params: { slug: idStr }, props: { id: o.id } });
+      seen.add(idStr);
+    }
+  }
+  return paths;
 }
 
-const { id } = Astro.params;
+const { id } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const o = await getOtro(id);
 

@@ -1,32 +1,46 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getVehiculos, getVehiculo, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml, getYoastSEO } from '../../lib/wordpress.js';
+import { getPropiedades, getPropiedad, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml, getYoastSEO } from '../../lib/wordpress.js';
 
 export async function getStaticPaths() {
-  const vehiculos = await getVehiculos();
-  return vehiculos.map((v) => ({ params: { id: String(v.id) } }));
+  const propiedades = await getPropiedades();
+  const seen = new Set();
+  const paths = [];
+  for (const p of propiedades) {
+    if (p.slug && !seen.has(p.slug)) {
+      paths.push({ params: { slug: p.slug }, props: { id: p.id } });
+      seen.add(p.slug);
+    }
+    // Retrocompatibilidad: las URLs numéricas antiguas siguen funcionando
+    const idStr = String(p.id);
+    if (!seen.has(idStr)) {
+      paths.push({ params: { slug: idStr }, props: { id: p.id } });
+      seen.add(idStr);
+    }
+  }
+  return paths;
 }
 
-const { id } = Astro.params;
+const { id } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const v = await getVehiculo(id);
+const p = await getPropiedad(id);
 
-const img      = getFeaturedImage(v);
-const marca    = getField(v, 'marca');
-const modelo   = getField(v, 'modelo');
-const anio     = getField(v, 'anio');
-const km       = getField(v, 'kilometraje');
-const precio   = getField(v, 'precio_base');
-const fecha    = getField(v, 'fecha_remate');
-const estado   = getField(v, 'estado_vehiculo');
-const hora     = getField(v, 'hora_remate');
-const zoom     = getField(v, 'enlace_zoom');
-const galeria  = getField(v, 'galeria');  // array of image objects or URLs
+const img        = getFeaturedImage(p);
+const tipo       = getField(p, 'tipo_propiedad');
+const superficie = getField(p, 'superficie_m2');
+const ubicacion  = getField(p, 'comuna');
+const precio     = getField(p, 'precio_base');
+const fecha      = getField(p, 'fecha_remate');
+const descripcion= getField(p, 'descripcion');
+const galeria    = getField(p, 'galeria');
+const dorms      = getField(p, 'dormitorios');
+const banos      = getField(p, 'banos');
 
-const titulo   = marca && modelo ? `${marca} ${modelo}` : decodeHtml(v.title?.rendered);
-const seo      = getYoastSEO(v);
+const titulo = decodeHtml(p.title?.rendered);
+const seo = getYoastSEO(p);
+const precioUF = getField(p, 'prop_precio_uf') || precio;
 
-// Recopilar imágenes: featured + ACF galería + adjuntos WP
+// Imágenes: featured + ACF galería + adjuntos WP
 const imgs: string[] = [];
 if (img) imgs.push(img);
 if (Array.isArray(galeria)) {
@@ -35,8 +49,8 @@ if (Array.isArray(galeria)) {
     if (url && !imgs.includes(url)) imgs.push(url);
   });
 }
-if (Array.isArray((v as any)._attachments)) {
-  (v as any)._attachments.forEach((url: string) => {
+if (Array.isArray((p as any)._attachments)) {
+  (p as any)._attachments.forEach((url: string) => {
     if (url && !imgs.includes(url)) imgs.push(url);
   });
 }
@@ -54,7 +68,7 @@ if (Array.isArray((v as any)._attachments)) {
     <div class="max-w-7xl mx-auto px-5 py-3 flex items-center gap-2 text-sm text-gray-500">
       <a href={base} class="hover:text-primary transition">Inicio</a>
       <span>/</span>
-      <a href={`${base}/vehiculos`} class="hover:text-primary transition">Vehículos</a>
+      <a href={`${base}/propiedades`} class="hover:text-primary transition">Propiedades</a>
       <span>/</span>
       <span class="text-gray-800 font-medium truncate max-w-xs">{titulo}</span>
     </div>
@@ -63,11 +77,12 @@ if (Array.isArray((v as any)._attachments)) {
   <main class="max-w-7xl mx-auto px-5 py-10">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-      <!-- GALERÍA -->
+      <!-- GALERÍA CARRUSEL -->
       <div>
         {imgs.length > 0 ? (
           <div>
-            <div class="relative rounded-2xl overflow-hidden bg-gray-100 group" style="height:420px">
+            <!-- Imagen principal -->
+            <div class="relative rounded-2xl overflow-hidden bg-gray-100 group" style="height:520px">
               <img id="main-img" src={imgs[0]} alt={titulo}
                 class="w-full h-full object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
                 onclick="openLightbox(0)"
@@ -89,6 +104,7 @@ if (Array.isArray((v as any)._attachments)) {
                 </>
               )}
             </div>
+            <!-- Thumbnails -->
             {imgs.length > 1 && (
               <div class="flex gap-2 mt-3 overflow-x-auto pb-1 snap-x">
                 {imgs.map((src, i) => (
@@ -107,7 +123,7 @@ if (Array.isArray((v as any)._attachments)) {
         ) : (
           <div class="rounded-2xl bg-gray-100 flex items-center justify-center" style="height:420px">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" class="text-gray-300">
-              <path d="M3 17h18M3 17a2 2 0 01-2-2v-1l2-6h14l2 6v1a2 2 0 01-2 2M3 17l1 3h2l1-3M21 17l-1 3h-2l-1-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
             </svg>
           </div>
         )}
@@ -132,89 +148,86 @@ if (Array.isArray((v as any)._attachments)) {
       <div class="flex flex-col">
         <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">{titulo}</h1>
 
-        {estado && (
+        {tipo && (
           <span class="mt-2 inline-flex w-fit items-center bg-blue-50 text-primary text-sm font-semibold px-3 py-1 rounded-full border border-primary/20">
-            {estado}
+            {tipo}
           </span>
         )}
 
-        <p class="text-accent font-extrabold mt-4" style="font-size:32px">{formatPrecio(precio)}</p>
+        <p class="text-accent font-extrabold mt-4" style="font-size:32px">
+          {precioUF ? `UF ${Number(precioUF).toLocaleString('es-CL')}` : formatPrecio(precio)}
+        </p>
         <p class="text-gray-400 text-sm mt-0.5">Precio base de remate</p>
 
         <!-- FICHA TÉCNICA -->
-        <div class="mt-6 bg-gray-50 rounded-2xl p-6 grid grid-cols-2 gap-5">
-          {marca && (
+        <div class="mt-6 bg-gray-50 rounded-2xl p-5 grid grid-cols-2 gap-4">
+          {tipo && (
             <div>
-              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Marca</p>
-              <p class="text-gray-900 font-bold mt-1 text-xl">{marca}</p>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Tipo</p>
+              <p class="text-gray-800 font-semibold mt-0.5">{tipo}</p>
             </div>
           )}
-          {modelo && (
+          {superficie && (
             <div>
-              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Modelo</p>
-              <p class="text-gray-900 font-bold mt-1 text-xl">{modelo}</p>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Superficie</p>
+              <p class="text-gray-800 font-semibold mt-0.5">{superficie} m²</p>
             </div>
           )}
-          {anio && (
+          {dorms && (
             <div>
-              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Año</p>
-              <p class="text-gray-900 font-bold mt-1 text-xl">{anio}</p>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Dormitorios</p>
+              <p class="text-gray-800 font-semibold mt-0.5">{dorms}</p>
             </div>
           )}
-          {km && Number(km) > 0 && (
+          {banos && (
             <div>
-              <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Kilometraje</p>
-              <p class="text-gray-900 font-bold mt-1 text-xl">{Number(km).toLocaleString('es-CL')} km</p>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Baños</p>
+              <p class="text-gray-800 font-semibold mt-0.5">{banos}</p>
+            </div>
+          )}
+          {ubicacion && (
+            <div>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Comuna</p>
+              <p class="text-gray-800 font-semibold mt-0.5">{ubicacion}</p>
             </div>
           )}
           {fecha && (
             <div class="col-span-2">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Fecha de remate</p>
-                  <p class="text-accent font-extrabold mt-1 text-2xl">{formatFecha(fecha)}</p>
-                </div>
-                {hora && (
-                  <div>
-                    <p class="text-sm text-gray-400 uppercase tracking-wide font-semibold">Hora</p>
-                    <p class="text-accent font-extrabold mt-1 text-2xl">{hora}</p>
-                  </div>
-                )}
-              </div>
+              <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Fecha de remate</p>
+              <p class="text-accent font-bold mt-0.5 text-lg">{formatFecha(fecha)}</p>
               <div class="flex flex-wrap gap-2 mt-3"
                 id="cal-btns"
                 data-fecha={String(fecha).replace(/-/g,'')}
                 data-titulo={titulo}
                 data-precio={precio ? formatPrecio(precio) : ''}
               >
-                <button onclick="calGoogle()" class="cal-btn inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
+                <button onclick="calGoogle()" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
                   <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                   Google Calendar
                 </button>
-                <button onclick="calIcal()" class="cal-btn inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="18" rx="2" fill="#1a1a1a"/><path d="M2 9h20" stroke="white" stroke-width="1.5"/><path d="M7 2v4M17 2v4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><rect x="7" y="2" width="2" height="4" rx="1" fill="#555"/><rect x="15" y="2" width="2" height="4" rx="1" fill="#555"/></svg>
+                <button onclick="calIcal()" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="18" rx="2" fill="#1a1a1a"/><path d="M2 9h20" stroke="white" stroke-width="1.5"/><rect x="7" y="2" width="2" height="4" rx="1" fill="#555"/><rect x="15" y="2" width="2" height="4" rx="1" fill="#555"/></svg>
                   Apple / iCal
                 </button>
               </div>
-              {zoom && (
-                <a href={zoom} target="_blank" rel="noopener"
-                  class="mt-4 inline-flex items-center gap-2 bg-[#2D8CFF] hover:bg-[#0b7bff] text-white font-bold px-5 py-3 rounded-xl transition text-base shadow-sm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M3 7a2 2 0 012-2h9a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm15 2.5l3.5-2.5v10L18 14.5v-5z"/></svg>
-                  Unirse al remate por Zoom
-                </a>
-              )}
             </div>
           )}
         </div>
 
         <!-- DESCRIPCIÓN -->
-        {v.content?.rendered && (
-          <div class="mt-5 prose prose-sm max-w-none text-gray-600" set:html={v.content.rendered} />
+        {(descripcion || p.content?.rendered) && (
+          <div class="mt-5">
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-2">Descripción</p>
+            {descripcion
+              ? <p class="text-gray-600 text-sm leading-relaxed">{descripcion}</p>
+              : <div class="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none" set:html={p.content.rendered} />
+            }
+          </div>
         )}
 
         <!-- CTA -->
         <div id="contacto" class="mt-8 bg-primary/5 rounded-2xl p-5 border border-primary/10">
-          <p class="font-bold text-gray-800 text-base mb-1">¿Te interesa este vehículo?</p>
+          <p class="font-bold text-gray-800 text-base mb-1">¿Te interesa esta propiedad?</p>
           <p class="text-gray-500 text-sm mb-4">Contáctanos para más información o para participar en el remate.</p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a id="wa-btn" href="#" target="_blank"
@@ -226,8 +239,8 @@ if (Array.isArray((v as any)._attachments)) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="1.8"/><path d="M2 7l10 7 10-7" stroke="white" stroke-width="1.8"/></svg>
               Enviar consulta
             </a>
-            <a href={`${base}/vehiculos`} class="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-xl transition text-sm border border-gray-200">
-              ← Ver todos
+            <a href={`${base}/propiedades`} class="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-xl transition text-sm border border-gray-200">
+              ← Ver todas
             </a>
           </div>
         </div>
@@ -242,7 +255,6 @@ if (Array.isArray((v as any)._attachments)) {
 </Layout>
 
 <script>
-  // ── Add to Calendar ──────────────────────────────────────────
   function calData() {
     const el = document.getElementById('cal-btns')!;
     const d  = (el as HTMLElement).dataset;
@@ -256,8 +268,7 @@ if (Array.isArray((v as any)._attachments)) {
   }
   function calIcal() {
     const { raw, titulo, precio } = calData();
-    const uid = raw + '-' + Math.random().toString(36).slice(2,9) + '@rematesbipro.cl';
-    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//RematesBiPro//ES','BEGIN:VEVENT',`DTSTART;VALUE=DATE:${raw}`,`DTEND;VALUE=DATE:${raw}`,`SUMMARY:Remate: ${titulo}`,`DESCRIPTION:Precio base: ${precio} - RematesBiPro`,'LOCATION:Chile',`UID:${uid}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//RematesBiPro//ES','BEGIN:VEVENT',`DTSTART;VALUE=DATE:${raw}`,`DTEND;VALUE=DATE:${raw}`,`SUMMARY:Remate: ${titulo}`,`DESCRIPTION:Precio base: ${precio} - RematesBiPro`,'LOCATION:Chile',`UID:${raw}-${Math.random().toString(36).slice(2,9)}@rematesbipro.cl`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a');
     a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
     a.download = `remate-${raw}.ics`;
@@ -288,6 +299,7 @@ if (Array.isArray((v as any)._attachments)) {
       b.classList.toggle('ring-primary/20', i === currentIdx);
       b.classList.toggle('border-transparent', i !== currentIdx);
     });
+    // Scroll active thumb into view
     const activeThumb = document.querySelector(`.thumb-btn[data-idx="${currentIdx}"]`);
     activeThumb?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }
@@ -330,6 +342,7 @@ if (Array.isArray((v as any)._attachments)) {
     goToSlide(currentIdx);
   }
 
+  // Keyboard navigation
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     const lb = document.getElementById('lightbox')!;
     if (!lb.classList.contains('hidden')) {
@@ -349,12 +362,12 @@ if (Array.isArray((v as any)._attachments)) {
   (window as any).lbPrev = lbPrev;
   (window as any).currentIdx = currentIdx;
 
-  // WhatsApp
+  // WhatsApp con título + URL de la propiedad
   const waBtn = document.getElementById('wa-btn') as HTMLAnchorElement;
   if (waBtn) {
-    const titulo = document.querySelector('h1')?.textContent?.trim() || 'este vehículo';
+    const titulo = document.querySelector('h1')?.textContent?.trim() || 'esta propiedad';
     const url = window.location.href;
-    const msg = encodeURIComponent(`Hola, me interesa este vehículo:\n*${titulo}*\n${url}`);
+    const msg = encodeURIComponent(`Hola, me interesa esta propiedad:\n*${titulo}*\n${url}`);
     waBtn.href = `https://wa.me/56975884719?text=${msg}`;
   }
 </script>

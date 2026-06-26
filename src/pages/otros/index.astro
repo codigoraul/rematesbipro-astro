@@ -41,7 +41,7 @@ const otros = await getOtros();
           const precio    = getField(o, 'precio_base');
           const fecha     = getField(o, 'fecha_remate');
           return (
-            <a href={`${base}/otros/${o.id}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-primary/30 block">
+            <a href={`${base}/otros/${o.slug}`} class="remate-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-primary/30 block">
               <div class="relative overflow-hidden" style="height:200px">
                 {img
                   ? <img src={img} alt={o.title?.rendered || 'Artículo'} class="w-full h-full object-cover" loading="lazy" />
