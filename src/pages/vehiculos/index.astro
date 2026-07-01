@@ -25,37 +25,6 @@ const vehiculos = await getVehiculos();
     </div>
   </section>
 
-  <!-- BANNER GARANTÍA -->
-  <section class="bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-5 py-6">
-      <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-        <div class="bg-primary text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <p class="font-extrabold text-lg">Garantía para participar en el remate</p>
-            <p class="text-white/70 text-sm">Debes constituir la garantía en la cuenta corriente indicada abajo antes del remate.</p>
-          </div>
-          <a href={`${base}/docs/bases-remate-vehiculos-bipro.pdf`} target="_blank" rel="noopener"
-            class="inline-flex items-center gap-2 bg-accent hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-xl transition text-sm whitespace-nowrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Descargar bases del remate
-          </a>
-        </div>
-        <div class="bg-orange-50 px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div class="text-gray-700 leading-relaxed">
-            <p><span class="font-bold">BIPRO SpA</span> · RUT 78.416.392-K</p>
-            <p>Banco BCI · Cuenta Corriente N° 77175996</p>
-            <p>garantia@rematesbipro.cl</p>
-            <p class="mt-2">Para más información: <a href="tel:+56948041797" class="font-semibold hover:text-primary transition">+56 9 4804 1797</a> · <a href="tel:+56950119127" class="font-semibold hover:text-primary transition">+56 9 5011 9127</a> · <a href="tel:+56975884719" class="font-semibold hover:text-primary transition">+56 9 7588 4719</a></p>
-          </div>
-          <div class="sm:text-right">
-            <p class="text-gray-400 text-xs uppercase tracking-wide font-semibold">Valor de garantía</p>
-            <p class="text-accent font-extrabold text-2xl">$300.000</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- LISTADO -->
   <main class="max-w-7xl mx-auto px-5 py-10">
     {vehiculos.length === 0 ? (
@@ -132,5 +101,36 @@ const vehiculos = await getVehiculos();
       </div>
     )}
   </main>
+
+  <!-- BANNER GARANTÍA -->
+  <section class="bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-5 py-10">
+      <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+        <div class="bg-primary text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <p class="font-extrabold text-lg">Garantía para participar en el remate</p>
+            <p class="text-white/70 text-sm">Debes constituir la garantía en la cuenta corriente indicada abajo antes del remate.</p>
+          </div>
+          <a href={`${base}/docs/bases-remate-vehiculos-bipro.pdf`} target="_blank" rel="noopener"
+            class="inline-flex items-center gap-2 bg-accent hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-xl transition text-sm whitespace-nowrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Descargar bases del remate
+          </a>
+        </div>
+        <div class="bg-orange-50 px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div class="text-gray-700 leading-relaxed">
+            <p><span class="font-bold">BIPRO SpA</span> · RUT 78.416.392-K</p>
+            <p>Banco BCI · Cuenta Corriente N° 77175996</p>
+            <p>garantia@rematesbipro.cl</p>
+            <p class="mt-2">Para más información: <a href="tel:+56948041797" class="font-semibold hover:text-primary transition">+56 9 4804 1797</a> · <a href="tel:+56950119127" class="font-semibold hover:text-primary transition">+56 9 5011 9127</a> · <a href="tel:+56975884719" class="font-semibold hover:text-primary transition">+56 9 7588 4719</a></p>
+          </div>
+          <div class="sm:text-right">
+            <p class="text-gray-400 text-xs uppercase tracking-wide font-semibold">Valor de garantía</p>
+            <p class="text-accent font-extrabold text-2xl">$300.000</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </Layout>
