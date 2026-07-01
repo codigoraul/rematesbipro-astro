@@ -200,6 +200,7 @@ if (Array.isArray((v as any)._attachments)) {
                 data-fecha={String(fecha).replace(/-/g,'')}
                 data-titulo={titulo}
                 data-precio={precio ? formatPrecio(precio) : ''}
+                data-hora={hora ? String(hora) : ''}
               >
                 <button onclick="calGoogle()" class="cal-btn inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
                   <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -262,24 +263,63 @@ if (Array.isArray((v as any)._attachments)) {
     const d  = (el as HTMLElement).dataset;
     const f  = d.fecha!;
     const iso = `${f.slice(0,4)}-${f.slice(4,6)}-${f.slice(6,8)}`;
-    return { raw: f, iso, titulo: d.titulo!, precio: d.precio! };
+    return { raw: f, iso, titulo: d.titulo!, precio: d.precio!, hora: (d.hora || '').trim() };
+  }
+  function calPad(n: number) { return String(n).padStart(2, '0'); }
+  // Interpreta "11:00", "11.30", "3 pm", "15:00", etc. → { hh, mm } o null
+  function calParseHora(h: string): { hh: number; mm: number } | null {
+    if (!h) return null;
+    const m = h.match(/(\d{1,2})(?:[:.h]?(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?/i);
+    if (!m) return null;
+    let hh = parseInt(m[1], 10);
+    const mm = m[2] ? parseInt(m[2], 10) : 0;
+    const ap = (m[3] || '').toLowerCase().replace(/\./g, '');
+    if (ap === 'pm' && hh < 12) hh += 12;
+    if (ap === 'am' && hh === 12) hh = 0;
+    if (hh > 23 || mm > 59) return null;
+    return { hh, mm };
+  }
+  // Inicio/fin (1 h) en formato YYYYMMDDTHHMMSS, hora local de Chile
+  function calTimes(raw: string, t: { hh: number; mm: number }) {
+    const y = +raw.slice(0, 4), mo = +raw.slice(4, 6), d = +raw.slice(6, 8);
+    const s = new Date(Date.UTC(y, mo - 1, d, t.hh, t.mm));
+    const e = new Date(s.getTime() + 60 * 60 * 1000);
+    const fmt = (x: Date) =>
+      `${x.getUTCFullYear()}${calPad(x.getUTCMonth() + 1)}${calPad(x.getUTCDate())}T${calPad(x.getUTCHours())}${calPad(x.getUTCMinutes())}00`;
+    return { start: fmt(s), end: fmt(e) };
   }
   function calGoogle() {
-    const { raw, titulo, precio } = calData();
-    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Remate: '+titulo)}&dates=${raw}/${raw}&details=${encodeURIComponent('Precio base: '+precio+'\nRematesBiPro — Gestión de Activos')}&location=Chile`, '_blank');
+    const { raw, titulo, precio, hora } = calData();
+    const t = calParseHora(hora);
+    const head = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Remate: ' + titulo)}&details=${encodeURIComponent('Precio base: ' + precio + '\nRematesBiPro — Gestión de Activos')}&location=Chile`;
+    const url = t
+      ? `${head}&dates=${calTimes(raw, t).start}/${calTimes(raw, t).end}&ctz=America/Santiago`
+      : `${head}&dates=${raw}/${raw}`;
+    window.open(url, '_blank');
   }
   function calIcal() {
-    const { raw, titulo, precio } = calData();
-    const uid = raw + '-' + Math.random().toString(36).slice(2,9) + '@rematesbipro.cl';
-    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//RematesBiPro//ES','BEGIN:VEVENT',`DTSTART;VALUE=DATE:${raw}`,`DTEND;VALUE=DATE:${raw}`,`SUMMARY:Remate: ${titulo}`,`DESCRIPTION:Precio base: ${precio} - RematesBiPro`,'LOCATION:Chile',`UID:${uid}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const { raw, titulo, precio, hora } = calData();
+    const t = calParseHora(hora);
+    const uid = raw + '-' + Math.random().toString(36).slice(2, 9) + '@rematesbipro.cl';
+    const dt = t
+      ? [`DTSTART:${calTimes(raw, t).start}`, `DTEND:${calTimes(raw, t).end}`]   // hora local (floating)
+      : [`DTSTART;VALUE=DATE:${raw}`, `DTEND;VALUE=DATE:${raw}`];
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//RematesBiPro//ES','BEGIN:VEVENT', ...dt, `SUMMARY:Remate: ${titulo}`,`DESCRIPTION:Precio base: ${precio} - RematesBiPro`,'LOCATION:Chile',`UID:${uid}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a');
     a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
     a.download = `remate-${raw}.ics`;
     a.click();
   }
   function calOutlook() {
-    const { iso, titulo, precio } = calData();
-    window.open(`https://outlook.live.com/calendar/0/deeplink/compose?path=/calendar/action/compose&rru=addevent&subject=${encodeURIComponent('Remate: '+titulo)}&startdt=${iso}&enddt=${iso}&body=${encodeURIComponent('Precio base: '+precio+'\nRematesBiPro — Gestión de Activos')}`, '_blank');
+    const { iso, titulo, precio, hora } = calData();
+    const t = calParseHora(hora);
+    let startdt = iso, enddt = iso;
+    if (t) {
+      const e = new Date(Date.UTC(+iso.slice(0,4), +iso.slice(5,7)-1, +iso.slice(8,10), t.hh, t.mm) + 60*60*1000);
+      startdt = `${iso}T${calPad(t.hh)}:${calPad(t.mm)}:00`;
+      enddt = `${e.getUTCFullYear()}-${calPad(e.getUTCMonth()+1)}-${calPad(e.getUTCDate())}T${calPad(e.getUTCHours())}:${calPad(e.getUTCMinutes())}:00`;
+    }
+    window.open(`https://outlook.live.com/calendar/0/deeplink/compose?path=/calendar/action/compose&rru=addevent&subject=${encodeURIComponent('Remate: '+titulo)}&startdt=${startdt}&enddt=${enddt}&body=${encodeURIComponent('Precio base: '+precio+'\nRematesBiPro — Gestión de Activos')}`, '_blank');
   }
   (window as any).calGoogle  = calGoogle;
   (window as any).calIcal    = calIcal;
