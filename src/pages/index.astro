@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getVehiculos, getPropiedades, getOtros, getFeaturedImage, getField, formatPrecio, formatFecha, decodeHtml } from '../lib/wordpress.js';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const vehiculos   = await getVehiculos();
 const propiedades = await getPropiedades();
 const otros       = await getOtros();

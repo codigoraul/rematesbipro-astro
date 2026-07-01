@@ -5,7 +5,7 @@ const {
   ogImage = '',
   canonical = ''
 } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const fullTitle = title.includes('Remates BiPro') ? title : `${title} | Remates BiPro`;
 ---
 <!DOCTYPE html>
