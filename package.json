@@ -12,6 +12,7 @@
     "astro": "node ./node_modules/astro/bin/astro.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.3.3"
   }
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rematesbipro.cl/sitemap-index.xml
